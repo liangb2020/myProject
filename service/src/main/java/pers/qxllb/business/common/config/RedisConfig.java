@@ -15,7 +15,7 @@ public class RedisConfig {
     /**
      * redis服务IP
      */
-    private String redisHost="127.0.0.1";
+    private String redisHost="192.168.43.74";
 
     /**
      * redis连接端口
@@ -45,6 +45,8 @@ public class RedisConfig {
     /**
      * 获取连接时的最大等待毫秒数
      */
-    private int maxWaitMillis=1000;
+    //private int maxWaitMillis=1000;
+
+    private int maxWaitMillis=-1;
 
 }

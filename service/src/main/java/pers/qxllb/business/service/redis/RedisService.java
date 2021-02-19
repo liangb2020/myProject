@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import pers.qxllb.business.common.config.RedisPoolConfig;
 import redis.clients.jedis.Jedis;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * TODO
  *
@@ -55,7 +57,7 @@ public class RedisService {
         return null;
     }
 
-    public String get(String key) {
+    public String get2(String key) {
         Jedis mJedis = getJedis();
         try {
             String result = mJedis.get(key);
@@ -66,6 +68,22 @@ public class RedisService {
             log.error(e.getMessage(), e);
         } finally {
             release(mJedis);
+        }
+        return null;
+    }
+
+    public String get(String key) {
+        Jedis mJedis = getJedis();
+        try {
+            String result = mJedis.get(key);
+            if (result != null) {
+                return result;
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            release(mJedis);
+        } finally {
+            //release(mJedis);
         }
         return null;
     }
@@ -98,11 +116,32 @@ public class RedisService {
         String key="test_set_20210216";
         String value="1232";
 
-        redisService.set(key, value,180);
-        String str=redisService.get(key);
-        System.out.println(str);
+        redisService.set(key, value,1800);
 
-        redisService.del(key);
+        CountDownLatch cdl = new CountDownLatch(1);
+        //并发1000
+        for(int i=0;i<100;i++){
+            new Thread(()->{
+                try {
+                    cdl.await();
+                    System.out.println(System.currentTimeMillis()+":"+Thread.currentThread().getName()+"--->"+redisService.get(key));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }).start();
+        }
+        cdl.countDown();
+
+
+        //String key="test_set_20210216";
+        //String value="1232";
+
+        //redisService.set(key, value,180);
+        //String str=redisService.get(key);
+        //System.out.println(str);
+
+        //redisService.del(key);
 
 
     }
