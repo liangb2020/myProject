@@ -2,19 +2,19 @@
 <project version="4">
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
-      <option name="id" value="central" />
-      <option name="name" value="central" />
-      <option name="url" value="https://maven.aliyun.com/nexus/content/groups/public" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="rdc-releases" />
-      <option name="name" value="rdc-releases" />
-      <option name="url" value="https://packages.aliyun.com/maven/repository/2027852-release-RNMkVc/" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="edas-oss-central" />
       <option name="name" value="taobao mirror central" />
       <option name="url" value="http://edas-public.oss-cn-hangzhou.aliyuncs.com/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="rdc-snapshots" />
+      <option name="name" value="rdc-snapshots" />
+      <option name="url" value="https://packages.aliyun.com/maven/repository/2027852-snapshot-vESUKK/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="central" />
+      <option name="url" value="https://maven.aliyun.com/nexus/content/groups/public" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />
@@ -22,9 +22,9 @@
       <option name="url" value="https://repo1.maven.org/maven2" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="jboss.community" />
-      <option name="name" value="JBoss Community repository" />
-      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+      <option name="id" value="rdc-releases" />
+      <option name="name" value="rdc-releases" />
+      <option name="url" value="https://packages.aliyun.com/maven/repository/2027852-release-RNMkVc/" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="snapshots" />
@@ -32,9 +32,9 @@
       <option name="url" value="https://maven.aliyun.com/nexus/content/groups/public" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="rdc-snapshots" />
-      <option name="name" value="rdc-snapshots" />
-      <option name="url" value="https://packages.aliyun.com/maven/repository/2027852-snapshot-vESUKK/" />
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
     </remote-repository>
   </component>
 </project>

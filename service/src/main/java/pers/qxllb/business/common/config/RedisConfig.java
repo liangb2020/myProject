@@ -15,7 +15,7 @@ public class RedisConfig {
     /**
      * redis服务IP
      */
-    private String redisHost="192.168.43.74";
+    private String redisHost="127.0.0.1";
 
     /**
      * redis连接端口
@@ -35,7 +35,7 @@ public class RedisConfig {
     /**
      * 最大连接数, 应用自己评估，不要超过ApsaraDB for Redis每个实例最大的连接数
      */
-    private int redisPoolMaxTotal=20;
+    private int redisPoolMaxTotal=30;
 
     /**
      * redis连接超时时长
@@ -46,7 +46,6 @@ public class RedisConfig {
      * 获取连接时的最大等待毫秒数
      */
     //private int maxWaitMillis=1000;
-
     private int maxWaitMillis=-1;
 
 }

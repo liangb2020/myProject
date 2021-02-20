@@ -1,6 +1,5 @@
 package pers.qxllb.business.service.redis;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import pers.qxllb.business.common.config.RedisPoolConfig;
 import redis.clients.jedis.Jedis;
@@ -23,12 +22,24 @@ public class RedisService {
         RedisPoolConfig = new RedisPoolConfig();
     }
 
+    private void display(String str){
+        System.out.println(System.currentTimeMillis()+":"+Thread.currentThread().getName()+"--->"+
+                str+
+                ",NumActive:"+RedisPoolConfig.getJedisPool().getNumActive()+
+                ",NumIdle:"+RedisPoolConfig.getJedisPool().getNumIdle()+
+                ",NumWaiters:"+RedisPoolConfig.getJedisPool().getNumWaiters());
+    }
+
     private Jedis getJedis() {
         Jedis jedis = null;
         try {
             jedis = RedisPoolConfig.getJedisPool().getResource();
+            System.out.println();
+            System.out.println(System.currentTimeMillis()+":"+Thread.currentThread().getName()+"--->getJedis() now,jedis:"+jedis);
+            display("getJedis() after");
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            e.printStackTrace();
         }
 
         return jedis;
@@ -83,7 +94,7 @@ public class RedisService {
             log.error(e.getMessage(), e);
             release(mJedis);
         } finally {
-            //release(mJedis);
+            release(mJedis);
         }
         return null;
     }
@@ -117,22 +128,24 @@ public class RedisService {
         String value="1232";
 
         redisService.set(key, value,1800);
+        redisService.display("redis set() after");
 
+        //
         CountDownLatch cdl = new CountDownLatch(1);
         //并发1000
-        for(int i=0;i<100;i++){
+        for(int i=0;i<1000;i++){
             new Thread(()->{
                 try {
-                    cdl.await();
-                    System.out.println(System.currentTimeMillis()+":"+Thread.currentThread().getName()+"--->"+redisService.get(key));
+                    cdl.await();  //hand 住线程，等所有线程篡创建OK了，再并发开始业务
+                    System.out.println(System.currentTimeMillis()+":"+Thread.currentThread().getName()+"--->"+"redis get() now,value:"+redisService.get(key));
+                    redisService.display("redis get() after");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
             }).start();
         }
-        cdl.countDown();
-
+        cdl.countDown();//可以开始并发
 
         //String key="test_set_20210216";
         //String value="1232";
@@ -142,7 +155,5 @@ public class RedisService {
         //System.out.println(str);
 
         //redisService.del(key);
-
-
     }
 }
