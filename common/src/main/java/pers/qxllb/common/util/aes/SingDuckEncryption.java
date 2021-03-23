@@ -5,6 +5,9 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Collectors;
 
 /**
@@ -300,33 +303,64 @@ public class SingDuckEncryption {
         return bytes;
     }
 
-    public static void main(String[] args) {
-        String key = KEY_MAP.get(DEFAULT_SECURE_NO);
-        //String key = "abcdefghijklmnop";
-        String data = "abcd123456";
+    public static void main(String[] args) throws InterruptedException {
+//        String key = KEY_MAP.get(DEFAULT_SECURE_NO);
+//        //String key = "abcdefghijklmnop";
+//        String data = "abcd123456";
+//
+//        String encrypStr = encryptToBase64(data);
+//        System.out.println(encrypStr);
+//
+//        byte[] encodedBytes = Base64.getDecoder().decode(encrypStr);
+//        try {
+//            String deData = new String(decrypt(encodedBytes, key.getBytes(CHAR_ENCODING)), CHAR_ENCODING);
+//            System.out.println(deData);
+//        } catch (UnsupportedEncodingException ex) {
+//
+//        }
+//        System.out.println(resolveSecureNo(encodedBytes));
+//        System.out.println(decryptFromBase64(encrypStr));
+//
+//
+//        String xxx = "dTD9eiSpqM8RUkVVpa05sHLW3aKfvTPwaJ9/MOjzHs8Xgh3qfa8jt/a2CqzcXUBBkncpIwBPoNEZnSV68MiQGrVwJQzTHE+3+G6AORQ0hHPc0kDSkQszTzdvspfEn6M95DlRj9qo3AhLbcu56VwEDsowW7fU7H/l3IeEe1VqlrgDMqUidYZTriJSa9qYqEKHQTvEznjDOXfZ75fOd7Zgtth8q+v2iRYXg5zrrkT1aQyBkd6GeSx60noc6q/l7YkncoQavFNMppLR88KtAitqhn+RrfSiqMmC0vWuuePf73qEZkpc9CGoafufvmVnTvkQb7HXhL9cDAC6O85XbHDLjtVXwRs8aWQjNtVZa8qk2rjzIMTCIu24CD+qlzM4t4Wc0RE4lkpBZdBXgWYn66h75nbRPUumbr95YbbCsP24QgOudPZJsgNeDWmf+sd9GKMdUjqarwSZy9HZkTAmzSSaLr+qoMJievl/pwGVybUp3HSfOawSJXVKhhDNcNI+In2wL/o57Yl5k33R92/lMGcdBPIK2vslwxno9b5MnXqCaP4fAcSBLxEkK7tBMAzb91OTNG24Ki1l0LBO6FgUXQpydZdRcvBhVBpi/POhfvnKfBhtNIruSj5k1uCqE56fTJ/K/dyDRV3vO5OCOccJHGDUQSY5gmaPFNl722meVC902dKZP0sGShzBcHLPO/3xnkH92UWu7Hu/SlaU3ZZPnX5piqBHekUEmT2Mx8ntHxa5U+5a3pzjSsQK+dpmcU8d9g9O9cA0ba2YTDPu8AY1MlxhmaifTSvfJZf0+yM0Q0rO97LGVeVh0oI1qC3SDUXHHx70FVR0mr/gn9w9LR6n4t0G4K48WQEkV9S652K5lfxCoCMvCJh3vbJZGNBRVbcSX1rvDTTUdh2+Qfm3iFnfjpUtZkLoNDNhHGyAwzir32J6x7aRbgFRjOjObqC5Vxk/BLajPCfH010XBbDLXBIPwJi8fKDcyThl6isPEB9nbpAH1EftHQupmjYLDn5LZvxJrgC362Ntns9BU7Qj/X/yuW5acE9IINr6X/VDXjtKd5vTQhoFYkH6WAzvnjYb67jInSnwHMbnwYVnOsfyxyPqq+IZBi0aEOY4wcC0XtU9LHZJo2MOR55e8mauKFHsy+xNJPQmdVMugWLgHvBP8IOnXzfJflrgP/brd9k1+uWRXEBvVrsFY5W27iAIOR3bokchTYUAw800EaYid47OgMF/Pc+pmEbcG6d2hByl4p4Jhqb4BUQ7NBiQVnnDZc3mO3QkQZ1DTGa47hE8S9GCw2RUcB7tz/njZTqYgtQIdH/5dx4eADffThckdGCg/gvg9xnF+VoCqi+1+vsKDVXUWoLNFpQykUxTgxSgMt+KSfoxUXD4UifNAdn1Y1uW57t35aSJYaSXjCb4gWQgA4kJrduY63C1Cq/Rec2eVZT3DCHab/es+d5gJqdKaumKxeOgcNVKPqB6SR/8i02qx02q0yP259iPCgmy3APv+TzAF37PlP489V0m28iG9oB2eM1r4Nw2VbUH+fRkMKqnXUkTCq7Te1KE83EzyeV/m+YiKetrY5vz7ykm0raF0DFTwkHMo/QK55vkUt3eINyzbKJ3fkk94wU2OrrEgNCLDup1AfExBkFFD3VL/VzdnHNhPdt8U+tEkWGvZLWilma/9PjpxoHjn4RqdqGzOP7oRw52jZcllUvOMgQNf9BTc+UWsWiF0Ow+OLxMy8A=";
+//        encodedBytes = Base64.getDecoder().decode(xxx);
+//        try {
+//            encodedBytes = GZipUtil.uncompress(SingDuckEncryption.decrypt(encodedBytes));
+//            String deData = new String(encodedBytes, CHAR_ENCODING);
+//            System.out.println(deData);
+//        } catch (UnsupportedEncodingException ex) {
+//
+//        }
 
-        String encrypStr = encryptToBase64(data);
-        System.out.println(encrypStr);
 
-        byte[] encodedBytes = Base64.getDecoder().decode(encrypStr);
-        try {
-            String deData = new String(decrypt(encodedBytes, key.getBytes(CHAR_ENCODING)), CHAR_ENCODING);
-            System.out.println(deData);
-        } catch (UnsupportedEncodingException ex) {
+        for(int i=0;i<8;i++){
+            new Thread(() -> {
+                while(true){
 
+                }
+            }).start();
         }
-        System.out.println(resolveSecureNo(encodedBytes));
-        System.out.println(decryptFromBase64(encrypStr));
 
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(10));
+        //
+        CountDownLatch cdl = new CountDownLatch(1);
 
-        String xxx = "dTD9eiSpqM8RUkVVpa05sHLW3aKfvTPwaJ9/MOjzHs8Xgh3qfa8jt/a2CqzcXUBBkncpIwBPoNEZnSV68MiQGrVwJQzTHE+3+G6AORQ0hHPc0kDSkQszTzdvspfEn6M95DlRj9qo3AhLbcu56VwEDsowW7fU7H/l3IeEe1VqlrgDMqUidYZTriJSa9qYqEKHQTvEznjDOXfZ75fOd7Zgtth8q+v2iRYXg5zrrkT1aQyBkd6GeSx60noc6q/l7YkncoQavFNMppLR88KtAitqhn+RrfSiqMmC0vWuuePf73qEZkpc9CGoafufvmVnTvkQb7HXhL9cDAC6O85XbHDLjtVXwRs8aWQjNtVZa8qk2rjzIMTCIu24CD+qlzM4t4Wc0RE4lkpBZdBXgWYn66h75nbRPUumbr95YbbCsP24QgOudPZJsgNeDWmf+sd9GKMdUjqarwSZy9HZkTAmzSSaLr+qoMJievl/pwGVybUp3HSfOawSJXVKhhDNcNI+In2wL/o57Yl5k33R92/lMGcdBPIK2vslwxno9b5MnXqCaP4fAcSBLxEkK7tBMAzb91OTNG24Ki1l0LBO6FgUXQpydZdRcvBhVBpi/POhfvnKfBhtNIruSj5k1uCqE56fTJ/K/dyDRV3vO5OCOccJHGDUQSY5gmaPFNl722meVC902dKZP0sGShzBcHLPO/3xnkH92UWu7Hu/SlaU3ZZPnX5piqBHekUEmT2Mx8ntHxa5U+5a3pzjSsQK+dpmcU8d9g9O9cA0ba2YTDPu8AY1MlxhmaifTSvfJZf0+yM0Q0rO97LGVeVh0oI1qC3SDUXHHx70FVR0mr/gn9w9LR6n4t0G4K48WQEkV9S652K5lfxCoCMvCJh3vbJZGNBRVbcSX1rvDTTUdh2+Qfm3iFnfjpUtZkLoNDNhHGyAwzir32J6x7aRbgFRjOjObqC5Vxk/BLajPCfH010XBbDLXBIPwJi8fKDcyThl6isPEB9nbpAH1EftHQupmjYLDn5LZvxJrgC362Ntns9BU7Qj/X/yuW5acE9IINr6X/VDXjtKd5vTQhoFYkH6WAzvnjYb67jInSnwHMbnwYVnOsfyxyPqq+IZBi0aEOY4wcC0XtU9LHZJo2MOR55e8mauKFHsy+xNJPQmdVMugWLgHvBP8IOnXzfJflrgP/brd9k1+uWRXEBvVrsFY5W27iAIOR3bokchTYUAw800EaYid47OgMF/Pc+pmEbcG6d2hByl4p4Jhqb4BUQ7NBiQVnnDZc3mO3QkQZ1DTGa47hE8S9GCw2RUcB7tz/njZTqYgtQIdH/5dx4eADffThckdGCg/gvg9xnF+VoCqi+1+vsKDVXUWoLNFpQykUxTgxSgMt+KSfoxUXD4UifNAdn1Y1uW57t35aSJYaSXjCb4gWQgA4kJrduY63C1Cq/Rec2eVZT3DCHab/es+d5gJqdKaumKxeOgcNVKPqB6SR/8i02qx02q0yP259iPCgmy3APv+TzAF37PlP489V0m28iG9oB2eM1r4Nw2VbUH+fRkMKqnXUkTCq7Te1KE83EzyeV/m+YiKetrY5vz7ykm0raF0DFTwkHMo/QK55vkUt3eINyzbKJ3fkk94wU2OrrEgNCLDup1AfExBkFFD3VL/VzdnHNhPdt8U+tEkWGvZLWilma/9PjpxoHjn4RqdqGzOP7oRw52jZcllUvOMgQNf9BTc+UWsWiF0Ow+OLxMy8A=";
-        encodedBytes = Base64.getDecoder().decode(xxx);
-        try {
-            encodedBytes = GZipUtil.uncompress(SingDuckEncryption.decrypt(encodedBytes));
-            String deData = new String(encodedBytes, CHAR_ENCODING);
-            System.out.println(deData);
-        } catch (UnsupportedEncodingException ex) {
+        String st = "dTB8IrGj8dB2rxY2GyZCX4FQ21KVa7nirtmCH9RGWsHnxFA+Etux9lVF2TvnMUxf2nc=";
 
+        //并发1000
+        for(int i=0;i<10000;i++){
+            new Thread(()->{
+                try {
+                    cdl.await();  //hand 住线程，等所有线程篡创建OK了，再并发开始业务
+                    long start = System.currentTimeMillis();
+                    System.out.println(SingDuckEncryption.decryptFromBase64(st)+"--"+Thread.currentThread().getState().name()+"--"+(System.currentTimeMillis()-start));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }).start();
         }
+        cdl.countDown();//可以开始并
     }
+
 }
