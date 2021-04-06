@@ -39,7 +39,7 @@ public enum CommonCode implements ErrorCode {
 
 
     /**
-     * 业务错误码
+     * 业务模块错误码
      */
 
 

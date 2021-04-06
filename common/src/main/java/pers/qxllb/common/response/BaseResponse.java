@@ -13,6 +13,14 @@ import java.io.Serializable;
  */
 @Data
 public class BaseResponse implements Serializable {
+
+    /**
+     * 响应状态码
+     */
     private Integer status;
+
+    /**
+     * 响应结果信息
+     */
     private String message;
 }
