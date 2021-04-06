@@ -63,16 +63,6 @@ public class ApiResponse<T> extends BaseResponse {
     }
 
     /**
-     * 错误对象封装
-     * @param errorCode
-     * @param <T>
-     * @return
-     */
-    public static <T> ApiResponse<T> error(CommonCode errorCode){
-        return error(errorCode.getCode(), errorCode.getMessage());
-    }
-
-    /**
      * 成功对象有数据返回封装
      * @param data
      * @param <T>
