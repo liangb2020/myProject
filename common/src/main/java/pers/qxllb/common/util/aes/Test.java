@@ -1,8 +1,7 @@
 package pers.qxllb.common.util.aes;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import lombok.SneakyThrows;
 
 import java.util.List;
 
@@ -15,10 +14,13 @@ import java.util.List;
 public class Test {
 
 
+    @SneakyThrows
     public static void main(String[] args){
         String songNames="[\"圣诞树\",\"小毛驴\",\"小星星(改编)\"]";
         List<String> list = JSON.parseArray(songNames, String.class);
         System.out.println(list);
+
+        System.in.read();
 
     }
 }
