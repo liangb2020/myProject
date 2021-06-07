@@ -90,10 +90,11 @@ public class LoadingCacheTest {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 1; i <= 20; i++) {
             //从缓存中得到数据，由于我们没有设置过缓存，所以需要通过CacheLoader加载缓存数据
+            System.out.println(i+":");
             Student student = studentCache.get(1);
-            System.out.println(student);
+            System.out.println("===="+student);
             //休眠1秒
             TimeUnit.SECONDS.sleep(1);
         }
