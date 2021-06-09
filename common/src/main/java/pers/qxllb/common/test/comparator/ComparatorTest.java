@@ -1,4 +1,4 @@
-package pers.qxllb.common.stream;
+package pers.qxllb.common.test.comparator;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @date 2021/6/8 16:00
  */
-public class StreamSortTest {
+public class ComparatorTest {
 
     public static void main(String[] args){
 
@@ -54,11 +54,16 @@ public class StreamSortTest {
         student3.setFans(20L);
         list.add(student3);
 
-       System.out.println(JSON.toJSONString(list));
+       System.out.println("before sort :"+JSON.toJSONString(list));
 
-       List<Student> finallyList= list.stream().filter(t->t.isOnline()).sorted(Comparator.comparingLong(Student::getBuyCnt).reversed()
-                            .thenComparingLong(Student::getFans).reversed()).collect(Collectors.toList());
+       //直接原集合多重排序,没条件过滤情况
+       list.sort(Comparator.comparing(Student::getBuyCnt,Comparator.reverseOrder())
+                    .thenComparing(Student::getFans,Comparator.reverseOrder())
+                    .thenComparing(Student::getComments,Comparator.reverseOrder())
+                );
+        System.out.println("after sort :"+JSON.toJSONString(list));
 
+        //根据条件过滤排序
         List<Student> finallyList1= list.stream().filter(t->t.isOnline()).map(t->{
             if (Objects.isNull(t.getBuyCnt())) {
                 t.setBuyCnt(0L);
@@ -67,7 +72,8 @@ public class StreamSortTest {
                 t.setFans(0L);
             }
             return t;
-        }).sorted(Comparator.comparing(Student::getBuyCnt,Comparator.reverseOrder())
+        }).sorted(  //Comparator.comparing默认是升序排序，用reversed改成降序
+                 Comparator.comparing(Student::getBuyCnt,Comparator.reverseOrder())
                 .thenComparing(Student::getFans,Comparator.reverseOrder())
                 .thenComparing(Student::getComments,Comparator.reverseOrder()))
                 .collect(Collectors.toList());

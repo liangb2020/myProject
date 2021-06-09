@@ -1,4 +1,4 @@
-package pers.qxllb.common.jvm;
+package pers.qxllb.common.test.jvm;
 
 import lombok.SneakyThrows;
 
