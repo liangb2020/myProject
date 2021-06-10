@@ -1,7 +1,5 @@
 package pers.qxllb.common.test.jvm;
 
-import lombok.SneakyThrows;
-
 /**
  * 类描述:
  *
