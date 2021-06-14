@@ -1,7 +1,5 @@
 package pers.qxllb.common.jvm;
 
-import lombok.SneakyThrows;
-
 /**
  * 类描述:
  *
@@ -38,8 +36,7 @@ public class JVMCase {
     // 静态变量（存放方法区）:class加载后，进行初始化阶段就开始赋值（还没有创建对象）；静态变量被所有的对象所共享，在内存中只有一个副本，它当且仅当在类初次加载时会被初始化; 后续对象new时，不会再初始化
     public static String WOMAN_SEX_TYPE = "woman";
 
-    @SneakyThrows
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         //第二步，执行线程方法，通过虚拟机栈存储
         //堆内存中会创建一个 student 对象，stu通过对象引用student（堆的地址）就存放在虚拟机栈栈中
@@ -58,6 +55,8 @@ public class JVMCase {
         jvmcase.sayHello(stu);
 
         System.in.read();
+
+
 
     }
 
