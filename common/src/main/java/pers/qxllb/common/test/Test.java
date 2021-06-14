@@ -1,4 +1,4 @@
-package pers.qxllb.common.util.aes;
+package pers.qxllb.common.test;
 
 import com.alibaba.fastjson.JSON;
 import lombok.SneakyThrows;
