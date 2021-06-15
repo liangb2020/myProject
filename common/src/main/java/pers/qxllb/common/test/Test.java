@@ -3,6 +3,8 @@ package pers.qxllb.common.test;
 import com.alibaba.fastjson.JSON;
 import lombok.SneakyThrows;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 /**
@@ -20,7 +22,14 @@ public class Test {
         List<String> list = JSON.parseArray(songNames, String.class);
         System.out.println(list);
 
-        System.in.read();
+        //System.in.read();
+
+
+        //毫秒 转 LocalDateTime IOS 交易时间不在订单的有效时间内【大于订单创建时间，小于订单失效时间】，则无效
+        LocalDateTime freshRecordTimeSource = LocalDateTime.now();
+        //偏移量60分钟
+        LocalDateTime freshRecordTime = freshRecordTimeSource.plusMinutes(60);
+        System.out.println("freshRecordTimeSource:"+freshRecordTimeSource+",freshRecordTime："+freshRecordTime);
 
     }
 }

@@ -1,5 +1,8 @@
 package pers.qxllb.common.test.jvm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 类描述:
  *
@@ -58,6 +61,19 @@ public class JVMCase {
 
     }
 
+    public void while1(){
+
+        List<Student> list = new ArrayList<>();
+        int i=0;
+        while(true){
+            Student student = new Student();
+            student.setName("Testgsdfgersgsgfsdgsdfgdsfgsdgsdfgd"+i);
+            student.setAge(i);
+            list.add(student);
+        }
+
+    }
+
 
     // 常规静态方法
     public static void print(Student stu) {
@@ -67,7 +83,11 @@ public class JVMCase {
 
     // 非静态方法
     public void sayHello(Student stu) {
+        int a = 10;
+        int b = 20;
+        int c = a * b;
         System.out.println(stu.getName() + "say: hello");
+        //while1();
     }
 }
 
