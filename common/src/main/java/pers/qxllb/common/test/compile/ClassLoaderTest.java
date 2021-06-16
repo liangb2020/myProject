@@ -1,4 +1,4 @@
-package pers.qxllb.common.test.jvm;
+package pers.qxllb.common.test.compile;
 
 /**
  * TODO
