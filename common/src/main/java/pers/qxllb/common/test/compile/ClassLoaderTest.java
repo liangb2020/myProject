@@ -8,7 +8,13 @@ package pers.qxllb.common.test.compile;
  * @date 2021/6/11 18:24
  */
 public class ClassLoaderTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException {
+
+        /**
+         * 1.Class•forName有重载方法可以指定是否需要初始化，而默认的方法初始化设置为true这会初始化类执行链接和初始化操作
+         * 2.ClassLoader是有类加载器的loadClass方法加载，传入的是false只会执行链接操作，而不会执行初始化操作
+         */
+        Class.forName("pers.qxllb.common.test.compile.ClassLoaderTest");
 
         //获取系统类加载器
         ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
