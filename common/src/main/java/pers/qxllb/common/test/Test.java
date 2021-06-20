@@ -15,8 +15,11 @@ import java.util.List;
  */
 public class Test {
 
-    private final int i = 5;
+    private final int i =6;
+    private static int j=4;
 
+    public Test(){
+    }
 
     @SneakyThrows
     public static void main(String[] args){
@@ -26,7 +29,7 @@ public class Test {
 
         //System.in.read();
 
-        System.out.println(Test.class.getClass());
+        //System.out.println(i);  error
 
 
         //毫秒 转 LocalDateTime IOS 交易时间不在订单的有效时间内【大于订单创建时间，小于订单失效时间】，则无效
