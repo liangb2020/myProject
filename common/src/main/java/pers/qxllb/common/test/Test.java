@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class Test {
 
+    private final int i = 5;
+
 
     @SneakyThrows
     public static void main(String[] args){
@@ -23,6 +25,8 @@ public class Test {
         System.out.println(list);
 
         //System.in.read();
+
+        System.out.println(Test.class.getClass());
 
 
         //毫秒 转 LocalDateTime IOS 交易时间不在订单的有效时间内【大于订单创建时间，小于订单失效时间】，则无效

@@ -28,7 +28,9 @@ public class InitStaticTest {
         /**
          * 用到Son父类Father的类变量，但是Son类没涉及使用，就不会初始化
          * 1.触发Father类初始化
-         * 2.初始化父类Father时，先对起父类YeYe进行初始化
+         * 2.初始化父类Father时，先对
+         *
+         * 起父类YeYe进行初始化
          * 3.完成后再进行Father的初始化
          */
         System.out.println(Son.strFatherStatic+"\n");
