@@ -28,12 +28,13 @@ public class OuterStatic {
     }
 
     /**
+     * 静态内部类不持有外部类的引用
      * 1.静态内部类不依赖于外部类的加载。（根据是否使用去加载，相当于内外平行的关系。）
      * 2.静态内部类不能直接访问外部类的非静态成员。（因为外部类加载的时候非静态成员是没有加载的，除非实例化之后）
      * 3.创建一个类的静态内部类对象不需要依赖其外部类对象
      */
     static class Inner{
-        String iStr = outStr;
+        private String iStr = outStr;
         Outer outer = new Outer();
 
         public void inPrint(){
