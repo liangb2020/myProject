@@ -1,4 +1,4 @@
-package pers.qxllb.common.cachebuilder;
+package pers.qxllb.common.test.googlecache;
 
 import com.google.common.cache.*;
 import com.google.common.util.concurrent.ListenableFuture;
