@@ -61,6 +61,10 @@ class YeYe{
     static {
         System.out.println("YeYe static{}静态代码块");
     }
+
+    public static void say(){
+        System.out.println("YeYe say().");
+    }
 }
 
 class Father extends YeYe{
