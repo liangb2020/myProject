@@ -27,12 +27,10 @@ public class Test {
         List<String> list = JSON.parseArray(songNames, String.class);
         System.out.println(list);
 
-
+        //java应用的临时目录
+        System.out.println(System.getProperty("java.io.tmpdir"));
 
         //System.out.println(i);  error
-
-        // 这里就会输出和上面类似的内容
-
 
         //毫秒 转 LocalDateTime IOS 交易时间不在订单的有效时间内【大于订单创建时间，小于订单失效时间】，则无效
         LocalDateTime freshRecordTimeSource = LocalDateTime.now();
