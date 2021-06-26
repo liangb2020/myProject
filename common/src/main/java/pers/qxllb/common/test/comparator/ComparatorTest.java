@@ -56,14 +56,14 @@ public class ComparatorTest {
 
        System.out.println("before sort :"+JSON.toJSONString(list));
 
-       //直接原集合多重排序,没条件过滤情况
+       //没条件过滤情况，直接原集合多重条件排序,a>b>c
        list.sort(Comparator.comparing(Student::getBuyCnt,Comparator.reverseOrder())
                     .thenComparing(Student::getFans,Comparator.reverseOrder())
                     .thenComparing(Student::getComments,Comparator.reverseOrder())
                 );
         System.out.println("after sort :"+JSON.toJSONString(list));
 
-        //根据条件过滤排序
+        //根据条件过滤，多重条件排序，A>B>C
         List<Student> finallyList1= list.stream().filter(t->t.isOnline()).map(t->{
             if (Objects.isNull(t.getBuyCnt())) {
                 t.setBuyCnt(0L);
