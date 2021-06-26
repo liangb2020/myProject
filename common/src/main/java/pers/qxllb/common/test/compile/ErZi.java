@@ -21,7 +21,7 @@ public class ErZi extends BaBa {
         String str1 = BaBa.strStatic;
         String str2 = ErZi.strStatic;
 
-        ErZi.sayStatic();
+        //ErZi.sayStatic();
 
     }
 
