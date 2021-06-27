@@ -38,9 +38,4 @@ public class SingletonEnum1 {
             return instance;
         }
     }
-
-    public static void main(String[] args){
-
-
-    }
 }
