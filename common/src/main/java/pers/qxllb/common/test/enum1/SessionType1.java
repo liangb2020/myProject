@@ -18,7 +18,7 @@ public enum SessionType1 {
     private String msg;
 
     // 必写：通过此构造器给枚举值创建实例
-    private SessionType1(String msg) {
+    SessionType1(String msg) {
         this.msg = msg;
     }
 
