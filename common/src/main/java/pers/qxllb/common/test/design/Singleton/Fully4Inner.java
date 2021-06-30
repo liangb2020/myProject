@@ -20,7 +20,7 @@ public class Fully4Inner {
     }
 
     /**
-     * 内部类实现
+     * 内部类实现，JVM线程安全
      */
     public static class InnerFully4Inner{
         private static Fully4Inner instance = new Fully4Inner(); //自行创建实例
