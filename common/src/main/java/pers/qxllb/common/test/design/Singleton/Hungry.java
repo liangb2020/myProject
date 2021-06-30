@@ -1,7 +1,7 @@
 package pers.qxllb.common.test.design.Singleton;
 
 /**
- * TODO
+ * 饿汉式是只要Hungry类被装载了，那么instance就会被实例化（没有达到lazy loading效果）
  *
  * @author liangb
  * @version 1.0

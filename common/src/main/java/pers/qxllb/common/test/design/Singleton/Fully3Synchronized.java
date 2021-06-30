@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * 懒汉模式 + synchronized同步锁 + double-check +volatile(可以保证线程间变量的可见性)
+ * 使用双重校验锁方式实现单例
  *
  * @author liangb
  * @version 1.0
