@@ -1,5 +1,6 @@
 package pers.qxllb.common.test.serializable;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
 
 import java.io.*;
@@ -16,6 +17,14 @@ public class Student implements Serializable {
     private Integer age;
     private String name;
 
+    /**
+     * 如果某个序列化类的成员变量是对象类型，则该对象类型的类必须实现序列化
+     */
+    private Teacher teacher;
+
+    /**
+     * 静态（static）成员变量是属于类级别的，而序列化是针对对象的，所以不能序列化
+     */
     public static String gender = "男";
 
     /**
@@ -24,18 +33,16 @@ public class Student implements Serializable {
      */
     transient  String specialty = "计算机专业";
 
-    @Override
-    public String toString() {
-        return "Student{" +"age=" + age + ", name='" + name + '\'' + ", gender='" + gender + '\'' + ", specialty='" + specialty + '\'' +
-                '}';
-    }
-
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         Student student = new Student();
         student.setAge(25);
         student.setName("jayWei");
-        System.out.println("序列化前："+student);
+        /**
+         * Exception in thread "main" java.io.NotSerializableException: pers.qxllb.common.test.serializable.Teacher
+         */
+        student.setTeacher(new Teacher());
+        System.out.println("序列化前："+ JSON.toJSONString(student));
 
         ObjectOutputStream objectOutputStream = new ObjectOutputStream( new FileOutputStream("D:\\text.out"));
         //对 Student 对象实现序列化
@@ -48,7 +55,7 @@ public class Student implements Serializable {
         //反序列化
         ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("D:\\text.out"));
         Student student1 = (Student) objectInputStream.readObject();
-        System.out.println("反序列化后："+student1);
+        System.out.println("反序列化后："+JSON.toJSONString(student1));
 
     }
 }
