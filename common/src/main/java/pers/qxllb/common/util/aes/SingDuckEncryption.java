@@ -5,9 +5,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Collectors;
 
 /**
@@ -304,10 +301,15 @@ public class SingDuckEncryption {
     }
 
     public static void main(String[] args) throws InterruptedException {
-//        String key = KEY_MAP.get(DEFAULT_SECURE_NO);
-//        //String key = "abcdefghijklmnop";
-//        String data = "abcd123456";
-//
+        String key = KEY_MAP.get(DEFAULT_SECURE_NO);
+        String data = "abcd123456";
+
+        //加密
+        String ut="dTDEqMzEl2Ic5yZI2%2Fe8lEKbh0idzohYv3FLgs25sTSJTg%3D%3D";
+        String utDe = SingDuckEncryption.decryptFromBase64(ut);
+        SingDuckEncryption.encrypt(data.getBytes(),SingDuckEncryption.resolveSecureNo(utDe));
+
+        //解密
 //        String encrypStr = encryptToBase64(data);
 //        System.out.println(encrypStr);
 //
@@ -333,34 +335,34 @@ public class SingDuckEncryption {
 //        }
 
 
-        for(int i=0;i<8;i++){
-            new Thread(() -> {
-                while(true){
-
-                }
-            }).start();
-        }
-
-        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(10));
-        //
-        CountDownLatch cdl = new CountDownLatch(1);
-
-        String st = "dTB8IrGj8dB2rxY2GyZCX4FQ21KVa7nirtmCH9RGWsHnxFA+Etux9lVF2TvnMUxf2nc=";
-
-        //并发1000
-        for(int i=0;i<10000;i++){
-            new Thread(()->{
-                try {
-                    cdl.await();  //hand 住线程，等所有线程篡创建OK了，再并发开始业务
-                    long start = System.currentTimeMillis();
-                    System.out.println(SingDuckEncryption.decryptFromBase64(st)+"--"+Thread.currentThread().getState().name()+"--"+(System.currentTimeMillis()-start));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }).start();
-        }
-        cdl.countDown();//可以开始并
+//        for(int i=0;i<8;i++){
+//            new Thread(() -> {
+//                while(true){
+//
+//                }
+//            }).start();
+//        }
+//
+//        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(10));
+//        //
+//        CountDownLatch cdl = new CountDownLatch(1);
+//
+//        String st = "dTB8IrGj8dB2rxY2GyZCX4FQ21KVa7nirtmCH9RGWsHnxFA+Etux9lVF2TvnMUxf2nc=";
+//
+//        //并发1000
+//        for(int i=0;i<10000;i++){
+//            new Thread(()->{
+//                try {
+//                    cdl.await();  //hand 住线程，等所有线程篡创建OK了，再并发开始业务
+//                    long start = System.currentTimeMillis();
+//                    System.out.println(SingDuckEncryption.decryptFromBase64(st)+"--"+Thread.currentThread().getState().name()+"--"+(System.currentTimeMillis()-start));
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }).start();
+//        }
+//        cdl.countDown();//可以开始并
     }
 
 }
