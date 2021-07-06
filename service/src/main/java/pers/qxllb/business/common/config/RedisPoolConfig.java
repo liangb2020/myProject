@@ -5,7 +5,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * TODO
+ * 懒汉模式 内部类实现
  *
  * @author liangb
  * @version 1.0
@@ -18,7 +18,10 @@ public class RedisPoolConfig {
 
     private JedisPool jedisPool;
 
-    public RedisPoolConfig(){
+    /**
+     * 优先实例化,只实例化1个
+     */
+    private RedisPoolConfig(){
 
         redisConfig = new RedisConfig();
         JedisPoolConfig config = new JedisPoolConfig();
@@ -34,4 +37,20 @@ public class RedisPoolConfig {
         jedisPool = new JedisPool(config, redisConfig.getRedisHost(), redisConfig.getRedisPort(),
                 redisConfig.getRedisTimeout(), redisConfig.getRedisPassword());
     }
+
+    /**
+     * 内部类实现，JVM线程安全
+     */
+    public static class InnerRedisPool{
+        private static RedisPoolConfig instance = new RedisPoolConfig();
+    }
+
+    /**
+     * 获取单例
+     * @return
+     */
+    public static RedisPoolConfig getInstance(){
+        return InnerRedisPool.instance;
+    }
+
 }

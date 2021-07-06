@@ -18,10 +18,6 @@ public class RedisService {
 
     private RedisPoolConfig RedisPoolConfig;
 
-    public RedisService(){
-        RedisPoolConfig = new RedisPoolConfig();
-    }
-
     private void display(String str){
         System.out.println(System.currentTimeMillis()+":"+Thread.currentThread().getName()+"--->"+
                 str+
@@ -68,6 +64,11 @@ public class RedisService {
         return null;
     }
 
+    /**
+     * 验证不释放连接资源
+     * @param key
+     * @return
+     */
     public String get2(String key) {
         Jedis mJedis = getJedis();
         try {
@@ -77,8 +78,6 @@ public class RedisService {
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-        } finally {
-            release(mJedis);
         }
         return null;
     }
@@ -130,14 +129,14 @@ public class RedisService {
         redisService.set(key, value,1800);
         redisService.display("redis set() after");
 
-        //
+        //并发测试
         CountDownLatch cdl = new CountDownLatch(1);
         //并发1000
         for(int i=0;i<1000;i++){
             new Thread(()->{
                 try {
                     cdl.await();  //hand 住线程，等所有线程篡创建OK了，再并发开始业务
-                    System.out.println(System.currentTimeMillis()+":"+Thread.currentThread().getName()+"--->"+"redis get() now,value:"+redisService.get(key));
+                    System.out.println(System.currentTimeMillis()+":"+Thread.currentThread().getName()+"--->"+"redis get() now,value:"+redisService.get2(key));
                     redisService.display("redis get() after");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -147,13 +146,5 @@ public class RedisService {
         }
         cdl.countDown();//可以开始并发
 
-        //String key="test_set_20210216";
-        //String value="1232";
-
-        //redisService.set(key, value,180);
-        //String str=redisService.get(key);
-        //System.out.println(str);
-
-        //redisService.del(key);
     }
 }
