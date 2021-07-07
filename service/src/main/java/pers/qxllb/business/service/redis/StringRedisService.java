@@ -1,7 +1,10 @@
 package pers.qxllb.business.service.redis;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
+
+import java.util.List;
 
 /**
  * String类型数据操作
@@ -11,7 +14,9 @@ import redis.clients.jedis.Jedis;
  * @date 2021/7/6 9:18
  */
 @Slf4j
-public class StringRedisService extends RedisBaseService {
+public class StringRedisService {
+
+    private final static String SUCCESS_RESULT = "OK";
 
     private StringRedisService(){}
 
@@ -45,37 +50,123 @@ public class StringRedisService extends RedisBaseService {
         }
     }
 
-    private Jedis get(){
-        return super.getJedis();
+    /**
+     * 获取连接资源
+     * @return
+     */
+    private Jedis getJedis(){
+        return RedisPoolUtil.getJedis();
+    }
+
+    /**
+     * 释放连接资源
+     * @param jedis
+     */
+    private void release(Jedis jedis){
+        RedisPoolUtil.release(jedis);
+    }
+
+    /**
+     * 获取Jedis连接状态
+     * @param str
+     */
+    public void redisStatus(String str) {
+        RedisPoolUtil.redisStatus(str);
+    }
+
+    /**
+     * 设置永不过期的对象或数据存json
+     * @param key key
+     * @param objectValue 对象或者数组泛型
+     * @param <T> 对象或者数组泛型
+     * @return true or false
+     */
+    public <T> boolean setObjectToJson(String key,T objectValue){
+        return setObjectToJson(key,objectValue,-1);
+
+    }
+
+    /**
+     * 设置有效期的对象或数据存json
+     * @param key key
+     * @param objectValue 对象或者数组泛型
+     * @param expire 失效秒数
+     * @param <T> 对象或者数组泛型
+     * @return  true or false
+     */
+    public <T> boolean setObjectToJson(String key,T objectValue,int expire){
+        String strJson = JSON.toJSONString(objectValue);
+        return set(key,strJson,expire);
+    }
+
+    /**
+     * 返回Object对象
+     * @param key
+     * @param tClass
+     * @param <T>
+     * @return
+     */
+    public <T> T getJson2Object(String key,Class<T> tClass){
+        String jsonStr = get(key);
+        return JSON.parseObject(jsonStr,tClass);
+    }
+
+    /**
+     * 返回List对象
+     * @param key
+     * @param tClass
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> getJson2List(String key, Class<T> tClass){
+        String jsonStr = get(key);
+        return JSON.parseArray(jsonStr,tClass);
     }
 
     /**
      * 永不过期的set
-     * @param key
-     * @param value
-     * @return
+     * @param key key
+     * @param value 字符串
+     * @return  true or false
      */
-    public String set(String key,String value){
+    public boolean set(String key,String value){
         return set(key,value,-1);
     }
 
     /**
      * 有效期的set
-     * @param key
-     * @param value
-     * @param expire
-     * @return
+     * @param key key
+     * @param value 字符串
+     * @param expire 失效秒数
+     * @return  true or false
      */
-    public String set(String key,String value, int expire){
+    public boolean set(String key,String value, int expire){
         Jedis mJedis = getJedis();
         try{
             String result = mJedis.set(key, value);
             if (expire > 0) {
                 mJedis.expire(key, expire);
             }
-            return result;
+            return SUCCESS_RESULT.equals(result);
         }catch (Exception ex){
             log.error("StringRedisService.set() error.",ex);
+        }finally {
+            release(mJedis);
+        }
+        return false;
+    }
+
+    /**
+     * 获取key数据
+     * @param key key
+     * @return
+     */
+    public String get(String key){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.get(key);
+        }catch (Exception ex){
+            log.error("StringRedisService.get() error.",ex);
         }finally {
             release(mJedis);
         }
@@ -87,14 +178,14 @@ public class StringRedisService extends RedisBaseService {
      * @param key
      * @return
      */
-    public String get(String key){
+    public String get2(String key){
         Jedis mJedis = getJedis();
         try{
             return mJedis.get(key);
         }catch (Exception ex){
             log.error("StringRedisService.get() error.",ex);
         }finally {
-            release(mJedis);
+            //release(mJedis);
         }
         return null;
     }

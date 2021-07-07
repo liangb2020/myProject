@@ -7,7 +7,7 @@ package pers.qxllb.business.service.redis;
  * @version 1.0
  * @date 2021/7/6 12:29
  */
-public class RedisUtil {
+public class RedisHelper {
 
     /**
      * 获取String redis处理对象

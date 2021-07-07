@@ -30,12 +30,12 @@ public class RedisConfig {
     /**
      * 最大空闲连接数, 应用自己评估，不要超过ApsaraDB for Redis每个实例最大的连接数
      */
-    private int redisPoolMaxIdle=10;
+    private int redisPoolMaxIdle=7;
 
     /**
      * 最大连接数, 应用自己评估，不要超过ApsaraDB for Redis每个实例最大的连接数
      */
-    private int redisPoolMaxTotal=30;
+    private int redisPoolMaxTotal=10;
 
     /**
      * redis连接超时时长
@@ -44,8 +44,10 @@ public class RedisConfig {
 
     /**
      * 获取连接时的最大等待毫秒数
+     * 1.不设置默认-1（锁等待）
+     * 2.设置超时，则异常抛出
      */
-    //private int maxWaitMillis=1000;
+    //private int maxWaitMillis=500;
     private int maxWaitMillis=-1;
 
 }
