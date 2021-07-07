@@ -174,7 +174,7 @@ public class StringRedisService {
     }
 
     /**
-     * 获取key数据
+     * 获取key数据，不释放连接资源验证
      * @param key
      * @return
      */

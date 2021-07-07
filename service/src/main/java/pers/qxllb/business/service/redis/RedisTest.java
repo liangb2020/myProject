@@ -51,7 +51,7 @@ public class RedisTest {
          */
         String strKey="str";
         String strValue="value";
-        stringRedisService.set(strKey,strValue,600);
+        stringRedisService.set(strKey,strValue);
         System.out.println(stringRedisService.get(strKey));
 
         /**
