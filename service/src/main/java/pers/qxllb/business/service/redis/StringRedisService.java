@@ -149,7 +149,7 @@ public class StringRedisService {
             }
             return SUCCESS_RESULT.equals(result);
         }catch (Exception ex){
-            log.error("StringRedisService.set() error.",ex);
+            log.error("StringRedisService.set() error,key:"+key,ex);
         }finally {
             release(mJedis);
         }
@@ -166,7 +166,7 @@ public class StringRedisService {
         try{
             return mJedis.get(key);
         }catch (Exception ex){
-            log.error("StringRedisService.get() error.",ex);
+            log.error("StringRedisService.get() error,key:"+key,ex);
         }finally {
             release(mJedis);
         }
@@ -174,33 +174,111 @@ public class StringRedisService {
     }
 
     /**
+     * 返回所有(一个或多个)给定 key 的值。
+     * 如果给定的 key 里面，有某个 key 不存在，那么这个 key 返回特殊值 null
+     * 减少网络带宽
+     * @param key
+     * @return
+     */
+    public List<String> mget(String[] key){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.mget(key);
+        }catch (Exception ex){
+            log.error("StringRedisService.mget() error,key:"+key,ex);
+        }finally {
+            release(mJedis);
+        }
+        return null;
+    }
+
+    /**
+     * 将 key 中储存的数字值增一，原子性操作
+     * 如果 key 不存在，那么 key 的值会先被初始化为 0 ，然后再执行 INCR 操作
+     * 本操作的值限制在 64 位(bit)有符号数字表示之内
+     * @param key
+     * @return
+     */
+    public Long incr(String key){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.incr(key);
+        }catch (Exception ex){
+            log.error("StringRedisService.incr() error,key:"+key,ex);
+        }finally {
+            release(mJedis);
+        }
+        return null;
+    }
+
+    /**
+     * 将 key 中储存的数字值增一，原子性操作
+     * 如果 key 不存在，那么 key 的值会先被初始化为 0 ，然后再执行 INCRBY 命令。
+     * 本操作的值限制在 64 位(bit)有符号数字表示之内。
+     * @param key
+     * @return
+     */
+    public Long incrBy(String key,long value){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.incrBy(key,value);
+        }catch (Exception ex){
+            log.error("StringRedisService.incrBy() error,key:"+key,ex);
+        }finally {
+            release(mJedis);
+        }
+        return null;
+    }
+
+    /**
+     * 将 key 中储存的数字值减一，原子性操作
+     * @param key
+     * @return
+     */
+    public Long decr(String key){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.decr(key);
+        }catch (Exception ex){
+            log.error("StringRedisService.decr() error,key:"+key,ex);
+        }finally {
+            release(mJedis);
+        }
+        return null;
+    }
+
+    /**
+     * 将 key 中储存的数字值减一，原子性操作
+     * @param key
+     * @return
+     */
+    public Long decrBy(String key,long value){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.decrBy(key,value);
+        }catch (Exception ex){
+            log.error("StringRedisService.decrBy() error,key:"+key,ex);
+        }finally {
+            release(mJedis);
+        }
+        return null;
+    }
+
+
+    /**
      * 获取key数据，不释放连接资源验证
      * @param key
      * @return
      */
-    public String get2(String key){
+    public String getErrorTest(String key){
         Jedis mJedis = getJedis();
         try{
             return mJedis.get(key);
         }catch (Exception ex){
-            log.error("StringRedisService.get() error.",ex);
+            log.error("StringRedisService.get2() error,key:"+key,ex);
         }finally {
             //release(mJedis);
         }
         return null;
     }
-
-
-    public String aaa(String key){
-        Jedis mJedis = getJedis();
-        try{
-
-        }catch (Exception ex){
-
-        }finally {
-
-        }
-        return null;
-    }
-
 }
