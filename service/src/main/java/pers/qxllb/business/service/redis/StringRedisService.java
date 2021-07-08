@@ -75,7 +75,7 @@ public class StringRedisService {
     }
 
     /**
-     * 设置永不过期的对象或数据存json
+     * 设置永不过期的对象或数组存json
      * @param key key
      * @param objectValue 对象或者数组泛型
      * @param <T> 对象或者数组泛型
@@ -87,7 +87,7 @@ public class StringRedisService {
     }
 
     /**
-     * 设置有效期的对象或数据存json
+     * 设置有效期的对象或数组存json
      * @param key key
      * @param objectValue 对象或者数组泛型
      * @param expire 失效秒数
