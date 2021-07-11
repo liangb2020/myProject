@@ -1,6 +1,6 @@
 package pers.qxllb.business.service.redis;
 
-import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import pers.qxllb.business.common.config.RedisConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -15,6 +15,7 @@ import java.util.Objects;
  * @version 1.0
  * @date 2021/2/16 20:30
  */
+@Slf4j
 public class RedisPoolUtil {
 
     private RedisConfig redisConfig;
@@ -61,7 +62,7 @@ public class RedisPoolUtil {
      * @return
      */
     public static Jedis getJedis(){
-        redisStatus("redis get() before");
+        //redisStatus("redis get() before");
         return getInstance().jedisPool.getResource();
     }
 
@@ -73,6 +74,73 @@ public class RedisPoolUtil {
         if(Objects.nonNull(jedis)){
             jedis.close();
         }
+    }
+
+    /**
+     * 命令用于删除已存在的键。不存在的 key 会被忽略
+     * @param key
+     * @return
+     */
+    public static Long del(String key){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.del(key);
+        }catch (Exception ex){
+            log.error("RedisPoolUtil.del key() error,key:"+key,ex);
+        }finally {
+            release(mJedis);
+        }
+        return null;
+    }
+
+    /**
+     * 命令用于删除已存在批量键。不存在的 keys 会被忽略
+     * @param keys
+     * @return
+     */
+    public static Long del(String[] keys){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.del(keys);
+        }catch (Exception ex){
+            log.error("RedisPoolUtil.del keys() error,key:"+keys,ex);
+        }finally {
+            release(mJedis);
+        }
+        return null;
+    }
+
+    /**
+     * 设置key的失效时间
+     * 1.设置成功返回 1 。
+     * 2.当 key 不存在或者不能为 key 设置过期时间时(比如在低于 2.1.3 版本的 Redis 中你尝试更新 key 的过期时间)返回 0
+     * @param key
+     * @param value
+     */
+    public static Long expire(String key, int value) {
+        Jedis jedis = getJedis();
+        try {
+            return jedis.expire(key, value);
+        } catch (Exception ex) {
+            log.error("RedisPoolUtil.expire() error,key:"+key,ex);
+        } finally {
+            release(jedis);
+        }
+        return null;
+    }
+
+    /**
+     * 判断key是否存在
+     * @param key
+     * @return
+     */
+    public static boolean exists(String key) {
+        try (Jedis jedis = getJedis()) {
+            return jedis.exists(key);
+        } catch (Exception ex) {
+            log.error("RedisPoolUtil.exists() error,key:"+key,ex);
+        }
+        return false;
     }
 
     /**

@@ -2,6 +2,7 @@ package pers.qxllb.business.service.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -74,10 +75,30 @@ public class RedisTest {
         List<String> listValue = stringRedisService.getJson2List(strListKey,String.class);
         System.out.println("getJson2List:"+(Objects.nonNull(listValue)?listValue: Collections.EMPTY_LIST));
 
+    }
+
+    public void testMsetString(){
+        Redis redis = new Redis();
+        redis.setAge(11);
+        redis.setName("name11");
+
+        Redis redis1 = new Redis();
+        redis1.setName("name22");
+        redis1.setAge(22);
+
         /**
-         * 4.mget,减少带宽
+         * 1. mset,减少带宽
          */
-        String[] keys = new String[]{strKey,strObjectKey,strListKey,"testKey"};
+        Map<String,String> map = Maps.newConcurrentMap();
+        map.put("mset1", JSON.toJSONString(redis));
+        map.put("mset2", JSON.toJSONString(redis1));
+        System.out.println("mset result:"+stringRedisService.mset(map, 600));
+
+
+        /**
+         * 2.mget,减少带宽
+         */
+        String[] keys = new String[]{"mset1","testKey","mset2"};
         //一次拿多个KEY
         List<String> mget = stringRedisService.mget(keys);
 
@@ -88,11 +109,9 @@ public class RedisTest {
                 countMap.put(keys[i],mget.get(i));
             }
         }
-        System.out.println("mget:"+(StringUtils.isBlank(countMap.get(strKey))?"0":countMap.get(strKey)));
-        System.out.println("mget:"+(StringUtils.isBlank(countMap.get(strObjectKey))?"0":countMap.get(strObjectKey)));
-        System.out.println("mget:"+(StringUtils.isBlank(countMap.get(strListKey))?"0":countMap.get(strListKey)));
-        System.out.println("mget:"+(StringUtils.isBlank(countMap.get("testKey"))?"0":countMap.get("testKey")));
-
+        System.out.println("mget mset1:"+(StringUtils.isBlank(countMap.get("mset1"))?"":countMap.get("mset1")));
+        System.out.println("mget testKey:"+(StringUtils.isBlank(countMap.get("testKey"))?"":countMap.get("testKey")));
+        System.out.println("mget mset2:"+(StringUtils.isBlank(countMap.get("mset2"))?"":countMap.get("mset2")));
     }
 
     public void testSetBit(){
@@ -112,21 +131,66 @@ public class RedisTest {
     }
 
     public  void testStringRedis(){
-        testSetString();
-        testStrIncr();
-        testStrDecr();
+//        testSetString();
+//        testMsetString();
+//        testStrIncr();
+//        testStrDecr();
+//        testStrLen();
+//        testLock();
+        testLockSet();
         testSetBit();
     }
 
-    public static void main(String[] args){
+    public void testLockSet(){
 
+        System.out.println(stringRedisService.lockSet("lockSet", 60));
+        System.out.println(stringRedisService.lockSet("lockSet", 80));
+
+        stringRedisService.lockDel("lockSet");
+
+    }
+
+    public void testLock(){
+        System.out.println(stringRedisService.lock("lock_123", 60));
+        System.out.println(stringRedisService.lock("lock_123", 60));
+    }
+
+    public void testStrLen(){
+        System.out.println("exist key strlen result:"+stringRedisService.strlen("strObjectKey"));
+        System.out.println("not exist key strlen result:"+stringRedisService.strlen("abc"));
+    }
+
+    public void testBaseRedis(){
+        //-------------删除keys----------------------
+        testSetString();
+        System.out.println("del key result:"+RedisPoolUtil.del("str"));  //单个key删除
+
+        List<String> keys = Arrays.asList("strObjectKey","strListKey","abc");
+        String[] strKeys=keys.toArray(new String[0]);
+        System.out.println("del keys result:"+RedisPoolUtil.del(strKeys));   //批量删除keys
+
+        testStrIncr();
+        //--------设置key过期时间------------------
+        System.out.println("expire key result:"+RedisPoolUtil.expire("incrKey", 600));
+
+        //-----------判断key是否存在----------------
+        System.out.println("exists key result:"+RedisPoolUtil.exists("incrKey"));
+    }
+
+    public static void main(String[] args){
         RedisTest redisTest = new RedisTest();
 
         //测试redis资源不释放的异常处理
         //redisTest.testRedisResourceError();
 
+        //base类型处理
+        //redisTest.testBaseRedis();
+
         //String类型处理
         redisTest.testStringRedis();
+
+
+
 
 
     }

@@ -1,10 +1,15 @@
 package pers.qxllb.business.service.redis;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * String类型数据操作
@@ -17,6 +22,12 @@ import java.util.List;
 public class StringRedisService {
 
     private final static String SUCCESS_RESULT = "OK";
+
+    private final static int OK_RESULT=1;
+
+    private final static Integer SPLIT_LENGTH_LIMIT = 2;
+
+    private final static Long EXPIRE_LIMIT = 1000L;
 
     private StringRedisService(){}
 
@@ -143,10 +154,11 @@ public class StringRedisService {
     public boolean set(String key,String value, int expire){
         Jedis mJedis = getJedis();
         try{
-            String result = mJedis.set(key, value);
-            if (expire > 0) {
-                mJedis.expire(key, expire);
-            }
+            String result = mJedis.setex(key, expire, value);
+//            String result = mJedis.set(key, value);
+//            if (expire > 0) {
+//                mJedis.expire(key, expire);
+//            }
             return SUCCESS_RESULT.equals(result);
         }catch (Exception ex){
             log.error("StringRedisService.set() error,key:"+key,ex);
@@ -171,6 +183,38 @@ public class StringRedisService {
             release(mJedis);
         }
         return null;
+    }
+
+    /**
+     * 设置一批key和value
+     * 用于同时设置一个或多个 key-value 对
+     * @param keyValues
+     * @param expire
+     * @return
+     */
+    public boolean mset(Map<String, String> keyValues, int expire){
+        try(Jedis jedis = getJedis()) {
+            List<String> keyDataList = Lists.newArrayList();
+            for (Map.Entry<String, String> entry : keyValues.entrySet()) {
+                keyDataList.add(entry.getKey());
+                keyDataList.add(entry.getValue());
+            }
+
+            String[] keyDatas = keyDataList.toArray(new String[0]);
+
+            String result = jedis.mset(keyDatas);
+            if (expire > 0) {
+                for (Map.Entry<String, String> entry : keyValues.entrySet()) {
+                    jedis.expire(entry.getKey(), expire);
+                }
+            }
+
+            return SUCCESS_RESULT.equals(result);
+        } catch (Exception ex) {
+            log.error("StringRedisService.mset() error,keys:"+keyValues,ex);
+        }
+
+        return false;
     }
 
     /**
@@ -264,6 +308,122 @@ public class StringRedisService {
         return null;
     }
 
+    /**
+     * 分布式锁处理
+     * Redis Setnx（SET if Not eXists） 命令在指定的 key 不存在时，为 key 设置指定的值
+     * 设置成功，返回 1 。 设置失败，返回 0
+     * 锁成功值命名规范： 线程名_年-月-日- 时:分:秒_[锁成功的时间戳毫秒]
+     *                main_2021-07-11 15:29:42_1625988582162
+     * @param key
+     * @param expire
+     * @return
+     */
+    public boolean lockSet(String key, int expire){
+        try (Jedis jedis = getJedis()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String t = Thread.currentThread().getName();
+
+            /**
+             * 原子性设置键值和过期时间
+             * 一、设置键值
+             *  NX ：只在键不存在时，才对键进行设置操作。 SET key value NX 效果等同于 SETNX key value 。
+             *  XX ：只在键已经存在时，才对键进行设置操作。
+             * 二、设置键值过期时间的单位
+             *  EX second ：设置键的过期时间为 second 秒。
+             *  PX millisecond ：设置键的过期时间为 millisecond 毫秒。
+             */
+            String str = jedis.set(key, t + "_" + sdf.format(new Date()) + "_" + System.currentTimeMillis(),"NX","EX",expire);
+            return StringUtils.isNotBlank(str)?true:false;
+        }catch (Exception ex){
+            log.error("StringRedisService.lockSet() error,key:"+key,ex);
+        }
+        return false;
+    }
+
+    /**
+     * 删除分布式锁,通过判断是否当前线程名称的分布式锁
+     * 1. 存在分布式锁提前过期的情况，线程没干活完，线程锁过期失效了；（我们评估操作共享资源的时间不准确导致的）
+     * 2. 防止释放别线程的锁；（一个客户端释放了其它客户端持有的锁）
+     * @param key
+     */
+    public void lockDel(String key){
+        try (Jedis jedis = getJedis()) {
+            String t = Thread.currentThread().getName(); //当前线程名称
+            String string = jedis.get(key);
+            if (StringUtils.isNotBlank(string)) {
+                String[] split = string.split("_");  //长度为3；main_2021-07-11 15:29:42_1625988582162
+                if (split.length >= SPLIT_LENGTH_LIMIT) {
+                    String tTmp = split[0]; //线程名称
+                    if(t.equals(tTmp)){
+                        //仅删除自己上锁的key,防止之前设置的key过期时间已到，这个时候是其他线程争抢到锁了，所以不能前面的线程锁删除后面的线程锁
+                        jedis.del(key);
+                    }
+                }
+            }
+        }catch (Exception ex){
+            log.error("StringRedisService.lockDel() error,key:"+key,ex);
+        }
+    }
+
+    /**
+     * 分布式锁处理(setnx和expire是两个操作)
+     * Redis Setnx（SET if Not eXists） 命令在指定的 key 不存在时，为 key 设置指定的值
+     * 设置成功，返回 1 。 设置失败，返回 0
+     * 锁成功值命名规范： 线程名-年-月-日- 时:分:秒_[锁成功的时间戳毫秒]
+     *              main-2021-07-11 15:29:42_1625988582162
+     * @param key key
+     * @param expire  单位:秒
+     * @return
+     */
+    public boolean lock(String key, int expire) {
+        boolean result = false;
+        try (Jedis jedis = getJedis()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String t = Thread.currentThread().getName();
+
+            long setnx = jedis.setnx(key, t + "-" + sdf.format(new Date()) + "_" + System.currentTimeMillis());
+            result = setnx == OK_RESULT ? true : false;
+            if (result) {
+                //锁成功
+                jedis.expire(key, expire == 0 ? 60 : expire);
+            } else {
+                // 防止分布式锁第二部锁失效异常的兜底处理；setnx和expire是两步操作，可能第二没设置成功，所以锁失败的需要判断是否死锁
+                String string = jedis.get(key);
+                if (StringUtils.isNotBlank(string)) {
+                    String[] split = string.split("_");
+                    if (split.length >= SPLIT_LENGTH_LIMIT) {
+                        long lastLockTimeMillis = Long.valueOf(split[split.length - 1]); //上次锁的时间
+                        long now = System.currentTimeMillis();   //当前时间
+                        long v = now - lastLockTimeMillis;       //锁的时长
+                        if (v > (expire + 1) * EXPIRE_LIMIT) {   //如果当前时间-上次锁的时间 大于锁过期时间，则兜底删除
+                            //防止之前锁的过期没释放
+                            jedis.del(key);
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            log.error("StringRedisService.lock() error,key:"+key,ex);
+        }
+        return result;
+    }
+
+    /**
+     * 返回 key 所储存的字符串值的长度
+     * @param key
+     * @return
+     */
+    public Long strlen(String key){
+        Jedis mJedis = getJedis();
+        try{
+            return mJedis.strlen(key);
+        }catch (Exception ex){
+            log.error("StringRedisService.strlen() error,key:"+key,ex);
+        }finally {
+            release(mJedis);
+        }
+        return null;
+    }
 
     /**
      * 获取key数据，不释放连接资源验证
